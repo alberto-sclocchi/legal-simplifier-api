@@ -37,15 +37,15 @@ router.post("/", upload.single("pdfFile"), async (req, res, next) => {
         },
         {
           role: "developer",
-          content: "You are a legal expert specialized in simplifying complex legal documents. First, verify if the provided text is a legal document. This includes—but is not limited to—contracts, terms of service, privacy policies, ADA compliance statements, waivers, liability disclaimers, legal notices, or regulatory agreements. If it is not, reply clearly: 'error'. Divide it in sections and provide a clear, concise summary of each section. Use simple language and avoid legal terms. Add emojis to make it more engaging. The output should be a structured summary with headings for each section, and the text should be easy to read and understand. Do not ask for any clarifications or additional information."
+          content: "You are a legal expert specialized in simplifying complex legal documents. First, verify if the provided text is a legal document. This includes—but is not limited to—contracts, terms of service, privacy policies, ADA compliance statements, waivers, liability disclaimers, legal notices, or regulatory agreements. If it is not, reply clearly: 'error'. Divide it in sections and provide a clear, concise summary of each section. Use simple language and avoid legal terms. Add emojis to make it more engaging. The output should be a structured summary with headings for each section, and the text should be easy to read and understand (possibly in bullet points). Do not ask for any clarifications or additional information. Begin your response directly with the simplified summary."
         }
       ]
     });
 
-    const doc = new PDFDocument();
-    doc.pipe(fs.createWriteStream(outputFilePath));
-    doc.text(response.output_text);
-    doc.end();
+    // const doc = new PDFDocument();
+    // doc.pipe(fs.createWriteStream(outputFilePath));
+    // doc.text(response.output_text);
+    // doc.end();
 
     let outputFileName = req.file.originalname;
     
