@@ -13,27 +13,30 @@ const OpenAI = require("openai");
 const upload = multer({ dest: "uploads/" });
 const client = new OpenAI({apiKey: process.env.OPEN_AI_API_KEY});
 
+async function extractTextFromPdf(path){
+  const fileBuffer = fs.readFileSync(path);
+  const data = await pdfParser(fileBuffer)
+
+  return data.text;
+}
+
 router.post("/", upload.single("pdfFile"), async (req, res, next) => {
-  const fileBuffer = fs.readFileSync(req.file.path);
+
+  // if(!fs.existsSync("outputs/")){
+  //   fs.mkdirSync("outputs/");
+  // }
 
   console.log("File Obj: ", req.file);
-
-  //create /outputs directory if it doesn't exist
-  if(!fs.existsSync("outputs/")){
-    fs.mkdirSync("outputs/");
-  }
-
-  const outputFilePath = path.join("outputs/", req.file.filename + ".pdf");
+  // const outputFilePath = path.join("outputs/", req.file.filename + ".pdf");
 
   try{
-    const data = await pdfParser(fileBuffer);
-
+    const fileText = await extractTextFromPdf(req.file.path);
     const response = await client.responses.create({
       model: "gpt-4.1",
       input: [
         {
           role: "user",
-          content: `Please simplify the following legal text:\n\n${data.text}`
+          content: `Please simplify the following legal text:\n\n${fileText}`
         },
         {
           role: "developer",
