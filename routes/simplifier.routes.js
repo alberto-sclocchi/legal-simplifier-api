@@ -72,4 +72,35 @@ router.get("/download/:fileName", (req, res) => {
   });
 });
 
+router.post("/question", upload.single("pdfFile"), async (req, res, next) => {
+   console.log("File Obj: ", req.file);
+
+  const { question } = req.body;
+  // const outputFilePath = path.join("outputs/", req.file.filename + ".pdf");
+
+  try{
+    const fileText = await extractTextFromPdf(req.file.path);
+    const response = await client.responses.create({
+      model: "gpt-4.1",
+      input: [
+        {
+          role: "user",
+          content: `Please answer this question:\n\n${question}\n Base the answer on the following legal text:\n\n${fileText}`
+        },
+        {
+          role: "developer",
+          content: "You are a legal expert specializing in simplifying complex legal documents. Begin with a bold heading that correlates to the question, then answer the user's question using only the uploaded text. Do not include any headings or introductions. Provide a direct, concise answer. If the question has multiple parts, clearly number your responses and label them. Verify if the provided text is a legal document. This includes—but is not limited to—contracts, terms of service, privacy policies, ADA compliance statements, waivers, liability disclaimers, legal notices, or regulatory agreements. If it is not, only reply: '🚫 This file is not a legal document.'. "
+        }
+      ]
+    });
+
+
+    res.json({success: true, answer: response.output_text});
+  } catch (err){
+    res.json({success: false, result: err})
+  } finally{
+    fs.unlinkSync(req.file.path); 
+  }
+});
+
 module.exports = router;
