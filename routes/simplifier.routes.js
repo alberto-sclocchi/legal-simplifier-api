@@ -160,6 +160,7 @@ router.post("/question/audio", upload.fields([{ name: 'pdfFile' }, { name: 'audi
   } finally{
     fs.unlinkSync(pdfFile.path); 
     fs.unlinkSync(audioFile.path); 
+    fs.unlinkSync(mp3Path)
   }
 });
 
