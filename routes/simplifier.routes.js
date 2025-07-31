@@ -164,4 +164,27 @@ router.post("/question/audio", upload.fields([{ name: 'pdfFile' }, { name: 'audi
   }
 });
 
+router.post("/assistant", async (req, res, next) => {
+  console.log(req.body.question);
+  try {
+    const response = await client.responses.create({
+      model: "gpt-4.1",
+      input: [
+        {
+          role: "user",
+          content: `Please answer this legal question:\n\n${req.body.question}`
+        },
+        {
+          role: "developer",
+          content: "You are a legal expert who provides clear, concise, and accurate answers to legal questions. Do not use headings and keep your response relatively short. Your responses should be professional and informative, using plain language when possible. If the user asks a question that is unrelated to legal matters, kindly respond with:'I'm here to assist with legal questions. Please ask a legal question so I can help you.'. If the question is unclear, kindly ask for clarification. Do not provide legal advice in place of a licensed attorney. When appropriate, recommend that the user consult a qualified legal professional for specific cases."
+        }
+      ]
+    });
+
+    res.json({success: true, answer: response.output_text});
+  } catch (err){
+    res.json({success: false, result: err})
+  } 
+});
+
 module.exports = router;
